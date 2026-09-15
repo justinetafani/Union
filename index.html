@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>UNION — Outil de positionnement</title>
+<meta name="description" content="Outil interactif de positionnement de marque pour les cinq fondateurs d'UNION." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <svg class="union-logo" viewBox="0 0 240 58" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="UNION">
+      <text x="120" y="44" text-anchor="middle" class="logo-halo">UNION</text>
+      <text x="120" y="44" text-anchor="middle" class="logo-fill">UNION</text>
+    </svg>
+    <p class="tagline">Studio d'expériences collectives — outil de positionnement</p>
+    <div class="prenom-field">
+      <label for="prenom-input">Votre prénom</label>
+      <input id="prenom-input" type="text" placeholder="Marie, Antoine, Minh Ta…" autocomplete="off" maxlength="40" />
+    </div>
+  </div>
+  <p id="connection-banner" class="connection-banner" hidden></p>
+  <p class="shared-note">Vos réponses sont partagées : chacun des 5 fondateurs qui ouvre ce lien voit et complète les mêmes données.</p>
+  <nav class="nav-tabs" aria-label="Modules">
+    <button class="nav-tab" data-target="module-1">1 · Curseurs</button>
+    <button class="nav-tab" data-target="module-2">2 · Carte</button>
+    <button class="nav-tab" data-target="module-3">3 · Brand key</button>
+    <button class="nav-tab" data-target="module-4">4 · Archétypes</button>
+    <button class="nav-tab" data-target="module-5">5 · Ton de voix</button>
+  </nav>
+</header>
+
+<main>
+
+  <!-- MODULE 1 — Curseurs de positionnement -->
+  <section id="module-1" class="module-section section-cream">
+    <div class="module-header">
+      <span class="module-kicker">Module 1</span>
+      <h2>Curseurs de positionnement</h2>
+      <p class="module-intro">17 curseurs pour situer UNION entre deux pôles. Bougez-les : votre radar se met à jour en direct. Cliquez sur « Enregistrer » pour partager vos réponses sous le prénom <strong class="prenom-echo">—</strong>.</p>
+    </div>
+
+    <div class="tabs-row">
+      <button id="m1-tab-mine" class="tab-btn active">Ma vue</button>
+      <button id="m1-tab-team" class="tab-btn">Vue de l'équipe</button>
+    </div>
+
+    <div id="m1-color-legend" class="color-legend" hidden></div>
+
+    <div class="radar-block">
+      <h3>Axes classiques</h3>
+      <div class="split-layout">
+        <div class="slider-list m1-mine-only" id="m1-slider-list-classiques"></div>
+        <div class="radar-col">
+          <div class="radar-chart" id="m1-radar-classiques"></div>
+          <div class="radar-legend-wrap" id="m1-legend-classiques"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="radar-block">
+      <h3>Axes spécifiques UNION</h3>
+      <div class="split-layout">
+        <div class="slider-list m1-mine-only" id="m1-slider-list-union"></div>
+        <div class="radar-col">
+          <div class="radar-chart" id="m1-radar-union"></div>
+          <div class="radar-legend-wrap" id="m1-legend-union"></div>
+        </div>
+      </div>
+    </div>
+
+    <button id="m1-save-btn" class="btn-primary m1-mine-only">Enregistrer mes curseurs</button>
+  </section>
+
+  <!-- MODULE 2 — Carte de positionnement -->
+  <section id="module-2" class="module-section section-dark">
+    <div class="module-header">
+      <span class="module-kicker">Module 2</span>
+      <h2>Carte de positionnement</h2>
+      <p class="module-intro">Choisissez un axe horizontal et un axe vertical parmi les 17. Nommez un point (UNION, un concurrent, une référence…) puis cliquez sur la carte pour le placer. Document collaboratif : tout le monde voit et modifie la même carte.</p>
+    </div>
+
+    <div class="axis-pickers">
+      <label>Axe horizontal
+        <select id="m2-axis-x"></select>
+      </label>
+      <label>Axe vertical
+        <select id="m2-axis-y"></select>
+      </label>
+    </div>
+
+    <p class="warning-note">⚠ Changer un axe réinitialise les points déjà placés, pour tout le monde.</p>
+
+    <div class="point-input-row">
+      <input id="m2-point-name" type="text" placeholder="Nom du point (ex. UNION, Concurrent X…)" maxlength="60" />
+      <span class="hint">puis cliquez sur la carte</span>
+    </div>
+
+    <div class="map-wrap">
+      <span class="map-axis-label map-top" id="m2-label-top"></span>
+      <span class="map-axis-label map-bottom" id="m2-label-bottom"></span>
+      <span class="map-axis-label map-left" id="m2-label-left"></span>
+      <span class="map-axis-label map-right" id="m2-label-right"></span>
+      <div class="map-square" id="m2-map"></div>
+    </div>
+
+    <div class="point-list" id="m2-point-list"></div>
+  </section>
+
+  <!-- MODULE 3 — Brand key -->
+  <section id="module-3" class="module-section section-cream">
+    <div class="module-header">
+      <span class="module-kicker">Module 3</span>
+      <h2>Brand key</h2>
+      <p class="module-intro">Cinq champs éditables par tous, sauvegardés en partagé. Modifiez le texte directement, il s'enregistre quand vous cliquez ailleurs.</p>
+    </div>
+    <div id="m3-fields" class="brandkey-grid"></div>
+  </section>
+
+  <!-- MODULE 4 — Roue des archétypes -->
+  <section id="module-4" class="module-section section-dark">
+    <div class="module-header">
+      <span class="module-kicker">Module 4</span>
+      <h2>Roue des archétypes de marque</h2>
+      <p class="module-intro">Choisissez 1 à 2 archétypes qui incarnent le mieux UNION, puis enregistrez sous votre prénom.</p>
+    </div>
+
+    <div class="tabs-row">
+      <button id="m4-tab-mine" class="tab-btn active">Ma vue</button>
+      <button id="m4-tab-team" class="tab-btn">Vue de l'équipe</button>
+    </div>
+
+    <div id="m4-mine-panel">
+      <div class="archetype-wheel" id="m4-wheel"></div>
+      <div class="selected-chips" id="m4-selected-chips"></div>
+      <button id="m4-save-btn" class="btn-primary">Enregistrer mes archétypes</button>
+    </div>
+
+    <div id="m4-team-panel" hidden>
+      <div class="ranking-list" id="m4-team-ranking"></div>
+    </div>
+  </section>
+
+  <!-- MODULE 5 — Matrice de ton de voix -->
+  <section id="module-5" class="module-section section-cream">
+    <div class="module-header">
+      <span class="module-kicker">Module 5</span>
+      <h2>Matrice de ton de voix</h2>
+      <p class="module-intro">Quatre curseurs pour définir le ton d'UNION à l'écrit comme à l'oral.</p>
+    </div>
+
+    <div class="tabs-row">
+      <button id="m5-tab-mine" class="tab-btn active">Ma vue</button>
+      <button id="m5-tab-team" class="tab-btn">Vue de l'équipe</button>
+    </div>
+
+    <div id="m5-color-legend" class="color-legend" hidden></div>
+
+    <div class="radar-block">
+      <div class="split-layout">
+        <div class="slider-list m5-mine-only" id="m5-slider-list"></div>
+        <div class="radar-col">
+          <div class="radar-chart" id="m5-radar"></div>
+          <div class="radar-legend-wrap" id="m5-legend"></div>
+        </div>
+      </div>
+    </div>
+
+    <button id="m5-save-btn" class="btn-primary m5-mine-only">Enregistrer mon ton de voix</button>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <p>UNION — collectif événementiel. Réponses partagées entre les cinq fondateurs ; identifiez-vous en haut de page pour retrouver les vôtres.</p>
+</footer>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
