@@ -6,10 +6,10 @@
 // dans les règles Firestore (voir README.md).
 
 export const firebaseConfig = {
-  apiKey: "REMPLACER_AVEC_VOTRE_API_KEY",
-  authDomain: "REMPLACER.firebaseapp.com",
-  projectId: "REMPLACER",
-  storageBucket: "REMPLACER.appspot.com",
-  messagingSenderId: "REMPLACER",
-  appId: "REMPLACER",
+  apiKey: "AIzaSyAPE78XXVFCTRRob19Xijtt9-l4Sc0mky8",
+  authDomain: "union-positionnement.firebaseapp.com",
+  projectId: "union-positionnement",
+  storageBucket: "union-positionnement.firebasestorage.app",
+  messagingSenderId: "423784028964",
+  appId: "1:423784028964:web:b6b99ffa8c0fcf1cafb1b1",
 };
