@@ -82,31 +82,18 @@
     <div class="module-header">
       <span class="module-kicker">Module 2</span>
       <h2>Carte de positionnement</h2>
-      <p class="module-intro">Choisissez un axe horizontal et un axe vertical parmi les 17. Nommez un point (UNION, un concurrent, une référence…) puis cliquez sur la carte pour le placer. Document collaboratif : tout le monde voit et modifie la même carte.</p>
+      <p class="module-intro">Trois axes fixes — Food, Design, Experience. Nommez un point (UNION, un concurrent, une référence…) puis cliquez dans le triangle pour le placer selon l'équilibre entre les trois. Document collaboratif : tout le monde voit et modifie la même carte.</p>
     </div>
-
-    <div class="axis-pickers">
-      <label>Axe horizontal
-        <select id="m2-axis-x"></select>
-      </label>
-      <label>Axe vertical
-        <select id="m2-axis-y"></select>
-      </label>
-    </div>
-
-    <p class="warning-note">⚠ Changer un axe réinitialise les points déjà placés, pour tout le monde.</p>
 
     <div class="point-input-row">
       <input id="m2-point-name" type="text" placeholder="Nom du point (ex. UNION, Concurrent X…)" maxlength="60" />
-      <span class="hint">puis cliquez sur la carte</span>
+      <span class="hint">puis cliquez dans le triangle</span>
     </div>
 
     <div class="map-wrap">
-      <span class="map-axis-label map-top" id="m2-label-top"></span>
-      <span class="map-axis-label map-bottom" id="m2-label-bottom"></span>
-      <span class="map-axis-label map-left" id="m2-label-left"></span>
-      <span class="map-axis-label map-right" id="m2-label-right"></span>
-      <div class="map-square" id="m2-map"></div>
+      <div class="map-square" id="m2-map">
+        <svg id="m2-triangle-svg" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>
+      </div>
     </div>
 
     <div class="point-list" id="m2-point-list"></div>
@@ -139,6 +126,7 @@
       <div class="archetype-wheel" id="m4-wheel"></div>
       <div class="selected-chips" id="m4-selected-chips"></div>
       <button id="m4-save-btn" class="btn-primary">Enregistrer mes archétypes</button>
+      <div class="archetype-definitions" id="m4-definitions"></div>
     </div>
 
     <div id="m4-team-panel" hidden>

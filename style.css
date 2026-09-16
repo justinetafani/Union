@@ -2,6 +2,7 @@
 :root {
   --cream: #f3ecdf;
   --cream-deep: #e8ddc6;
+  --white: #ffffff;
   --black: #141210;
   --black-soft: #1d1a17;
   --red: #c1272d;
@@ -21,7 +22,7 @@ html { color-scheme: light; }
 
 body {
   margin: 0;
-  background: var(--cream);
+  background: var(--white);
   color: var(--black);
   font-family: var(--font-ui);
   font-size: 16px;
@@ -63,7 +64,7 @@ button {
 }
 
 .union-logo {
-  width: 150px;
+  width: 220px;
   height: auto;
   flex-shrink: 0;
 }
@@ -196,24 +197,15 @@ button {
   padding: 40px 20px 64px;
 }
 
-.section-cream {
-  background: var(--cream);
-  color: var(--black);
-  --surface: #fffcf5;
-  --surface-line: var(--cream-deep);
-  --map-grid: #d8cba9;
-  --ink: var(--black);
-  --ink-muted: #766c5c;
-}
-
+.section-cream,
 .section-dark {
-  background: var(--black);
-  color: var(--cream);
-  --surface: var(--black-soft);
-  --surface-line: #3a352c;
-  --map-grid: #5c5546;
-  --ink: var(--cream);
-  --ink-muted: #a79e8e;
+  background: var(--white);
+  color: var(--black);
+  --surface: #fafaf7;
+  --surface-line: #e2ddd0;
+  --map-grid: #d9d2c0;
+  --ink: var(--black);
+  --ink-muted: #746b5c;
 }
 
 .module-header {
@@ -245,7 +237,6 @@ button {
 }
 
 .prenom-echo { color: var(--red); }
-.section-dark .prenom-echo { color: var(--yellow); }
 
 /* ---------- Tabs (mine / team) ---------- */
 .tabs-row {
@@ -471,45 +462,7 @@ input[type="range"].slider-input::-moz-range-thumb {
   font-size: 0.9rem;
 }
 
-/* ---------- Module 2 — map ---------- */
-.axis-pickers {
-  max-width: 960px;
-  margin: 0 auto 8px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-
-.axis-pickers label {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 0.8rem;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--ink-muted);
-  flex: 1 1 260px;
-}
-
-.axis-pickers select {
-  font-family: var(--font-ui);
-  font-size: 0.95rem;
-  padding: 9px 10px;
-  border-radius: 4px;
-  border: 1.5px solid var(--surface-line);
-  background: var(--surface);
-  color: var(--ink);
-}
-
-.warning-note {
-  max-width: 960px;
-  margin: 0 auto 20px;
-  color: var(--yellow);
-  font-size: 0.85rem;
-}
-
+/* ---------- Module 2 — carte ternaire ---------- */
 .point-input-row {
   max-width: 960px;
   margin: 0 auto 18px;
@@ -537,58 +490,43 @@ input[type="range"].slider-input::-moz-range-thumb {
 }
 
 .map-wrap {
-  max-width: 640px;
+  max-width: 560px;
   margin: 0 auto 8px;
-  position: relative;
-  padding: 34px 34px 40px 130px;
-}
-
-.map-axis-label {
-  position: absolute;
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 0.78rem;
-  letter-spacing: 0.03em;
-  color: var(--ink-muted);
-  text-align: center;
-}
-
-.map-top { top: 0; left: 130px; right: 34px; }
-.map-bottom { bottom: 6px; left: 130px; right: 34px; }
-.map-left {
-  left: 0;
-  top: 34px;
-  bottom: 40px;
-  width: 96px;
-  writing-mode: vertical-rl;
-  transform: rotate(180deg);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.map-right {
-  right: 0;
-  top: 34px;
-  bottom: 40px;
-  width: 24px;
-  writing-mode: vertical-rl;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .map-square {
   position: relative;
   aspect-ratio: 1;
   background: var(--surface);
-  border: 1.5px solid var(--red);
   border-radius: 4px;
   cursor: crosshair;
-  background-image:
-    linear-gradient(var(--map-grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--map-grid) 1px, transparent 1px);
-  background-size: 25% 25%;
-  background-position: center;
+}
+
+.map-square svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.ternary-grid {
+  fill: none;
+  stroke: var(--map-grid);
+  stroke-width: 0.3;
+}
+
+.ternary-outline {
+  fill: none;
+  stroke: var(--red);
+  stroke-width: 0.5;
+}
+
+.ternary-label {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 4.2px;
+  letter-spacing: 0.04em;
+  fill: var(--ink);
 }
 
 .map-point {
@@ -780,6 +718,39 @@ input[type="range"].slider-input::-moz-range-thumb {
   border-radius: 999px;
 }
 
+.archetype-definitions {
+  max-width: 640px;
+  margin: 40px auto 0;
+  padding-top: 24px;
+  border-top: 1px solid var(--surface-line);
+}
+
+.archetype-definitions h3 {
+  font-size: 1.1rem;
+  margin-bottom: 14px;
+}
+
+.archetype-definitions dl {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.archetype-definitions dt {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--red);
+}
+
+.archetype-definitions dd {
+  margin: 2px 0 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--ink-muted);
+}
+
 .ranking-list {
   max-width: 640px;
   margin: 0 auto;
@@ -859,7 +830,5 @@ input[type="range"].slider-input::-moz-range-thumb {
 
 /* ---------- Responsive ---------- */
 @media (max-width: 560px) {
-  .map-wrap { padding: 30px 20px 36px 96px; }
-  .map-left { width: 70px; }
   .rank-row { grid-template-columns: 100px 1fr 28px; }
 }

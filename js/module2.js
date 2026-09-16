@@ -1,79 +1,130 @@
-import { AXES_ALL } from "./data.js";
+import { TERNARY_AXES } from "./data.js";
 import { getPrenom } from "./identity.js";
 import { showToast } from "./utils.js";
 import {
   collection,
   doc,
-  getDoc,
-  getDocs,
-  setDoc,
   addDoc,
   deleteDoc,
   onSnapshot,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { db } from "./firebase.js";
 
-let config = { xAxis: AXES_ALL[0].id, yAxis: AXES_ALL[1].id };
+// Sommets du triangle en pourcentage du conteneur (proportions d'un
+// triangle équilatéral, marge laissée pour les libellés).
+const V = {
+  food: { x: 50, y: 10 },
+  design: { x: 8, y: 82.75 },
+  experience: { x: 92, y: 82.75 },
+};
+const CENTROID = {
+  x: (V.food.x + V.design.x + V.experience.x) / 3,
+  y: (V.food.y + V.design.y + V.experience.y) / 3,
+};
+
+function scaleTriangle(k) {
+  const scale = (p) => ({
+    x: CENTROID.x + k * (p.x - CENTROID.x),
+    y: CENTROID.y + k * (p.y - CENTROID.y),
+  });
+  return [scale(V.food), scale(V.design), scale(V.experience)];
+}
+
+function toCartesian(food, design, experience) {
+  const total = food + design + experience || 1;
+  const wF = food / total;
+  const wD = design / total;
+  const wE = experience / total;
+  return {
+    x: wF * V.food.x + wD * V.design.x + wE * V.experience.x,
+    y: wF * V.food.y + wD * V.design.y + wE * V.experience.y,
+  };
+}
+
+function toBarycentric(px, py) {
+  const A = V.food, B = V.design, C = V.experience;
+  const denom = (B.y - C.y) * (A.x - C.x) + (C.x - B.x) * (A.y - C.y);
+  let wA = ((B.y - C.y) * (px - C.x) + (C.x - B.x) * (py - C.y)) / denom;
+  let wB = ((C.y - A.y) * (px - C.x) + (A.x - C.x) * (py - C.y)) / denom;
+  let wC = 1 - wA - wB;
+  wA = Math.max(0, wA);
+  wB = Math.max(0, wB);
+  wC = Math.max(0, wC);
+  const sum = wA + wB + wC || 1;
+  return { food: (wA / sum) * 100, design: (wB / sum) * 100, experience: (wC / sum) * 100 };
+}
+
 let points = [];
 
-function axisById(id) {
-  return AXES_ALL.find((a) => a.id === id) || AXES_ALL[0];
+function pointsToPathAttr(pts) {
+  return pts.map((p) => `${p.x},${p.y}`).join(" ");
 }
 
-function populateSelects() {
-  const xSel = document.getElementById("m2-axis-x");
-  const ySel = document.getElementById("m2-axis-y");
-  [xSel, ySel].forEach((sel) => {
-    sel.innerHTML = "";
-    AXES_ALL.forEach((axis) => {
-      const opt = document.createElement("option");
-      opt.value = axis.id;
-      opt.textContent = `${axis.a} ↔ ${axis.b}`;
-      sel.appendChild(opt);
-    });
+function renderTriangleBackground() {
+  const svg = document.getElementById("m2-triangle-svg");
+  if (!svg) return;
+  svg.innerHTML = "";
+  const NS = "http://www.w3.org/2000/svg";
+  const el = (name, attrs) => {
+    const node = document.createElementNS(NS, name);
+    Object.entries(attrs).forEach(([k, v]) => node.setAttribute(k, v));
+    return node;
+  };
+
+  [1 / 3, 2 / 3].forEach((k) => {
+    svg.appendChild(
+      el("polygon", { points: pointsToPathAttr(scaleTriangle(k)), class: "ternary-grid" })
+    );
   });
-  xSel.value = config.xAxis;
-  ySel.value = config.yAxis;
-}
 
-function renderAxisLabels() {
-  const xa = axisById(config.xAxis);
-  const ya = axisById(config.yAxis);
-  document.getElementById("m2-label-left").textContent = xa.a;
-  document.getElementById("m2-label-right").textContent = xa.b;
-  document.getElementById("m2-label-top").textContent = ya.b;
-  document.getElementById("m2-label-bottom").textContent = ya.a;
+  svg.appendChild(
+    el("polygon", {
+      points: pointsToPathAttr([V.food, V.design, V.experience]),
+      class: "ternary-outline",
+    })
+  );
+
+  const labelDefs = [
+    { axis: TERNARY_AXES[0], x: V.food.x, y: V.food.y - 4, anchor: "middle" },
+    { axis: TERNARY_AXES[1], x: V.design.x + 2, y: V.design.y + 7, anchor: "start" },
+    { axis: TERNARY_AXES[2], x: V.experience.x - 2, y: V.experience.y + 7, anchor: "end" },
+  ];
+  labelDefs.forEach(({ axis, x, y, anchor }) => {
+    const text = el("text", { x, y, "text-anchor": anchor, class: "ternary-label" });
+    text.textContent = axis.label.toUpperCase();
+    svg.appendChild(text);
+  });
 }
 
 function renderPoints() {
-  const map = document.getElementById("m2-map");
-  map.querySelectorAll(".map-point").forEach((p) => p.remove());
-  const visible = points.filter((p) => p.xAxis === config.xAxis && p.yAxis === config.yAxis);
-  visible.forEach((p) => {
-    const dot = document.createElement("button");
-    dot.type = "button";
-    dot.className = "map-point";
-    dot.style.left = `${p.x}%`;
-    dot.style.top = `${100 - p.y}%`;
-    dot.innerHTML = `<span class="map-point-dot"></span><span class="map-point-label">${p.name}</span>`;
-    dot.title = "Cliquer pour supprimer ce point";
-    dot.addEventListener("click", (e) => {
+  const container = document.getElementById("m2-map");
+  container.querySelectorAll(".map-point").forEach((p) => p.remove());
+  points.forEach((p) => {
+    const pos = toCartesian(p.food, p.design, p.experience);
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "map-point";
+    btn.style.left = `${pos.x}%`;
+    btn.style.top = `${pos.y}%`;
+    btn.innerHTML = `<span class="map-point-dot"></span><span class="map-point-label">${p.name}</span>`;
+    btn.title = "Cliquer pour supprimer ce point";
+    btn.addEventListener("click", (e) => {
       e.stopPropagation();
       removePoint(p.id);
     });
-    map.appendChild(dot);
+    container.appendChild(btn);
   });
 
   const list = document.getElementById("m2-point-list");
   list.innerHTML = "";
-  if (visible.length === 0) {
-    list.innerHTML = `<p class="empty-note">Aucun point placé pour ces deux axes.</p>`;
+  if (points.length === 0) {
+    list.innerHTML = `<p class="empty-note">Aucun point placé pour l'instant.</p>`;
     return;
   }
-  visible.forEach((p) => {
+  points.forEach((p) => {
     const row = document.createElement("div");
     row.className = "point-row";
-    row.innerHTML = `<span>${p.name}</span><span class="point-coords">(${Math.round(p.x)}, ${Math.round(p.y)})</span>`;
+    row.innerHTML = `<span>${p.name}</span><span class="point-coords">Food ${Math.round(p.food)} · Design ${Math.round(p.design)} · Experience ${Math.round(p.experience)}</span>`;
     const btn = document.createElement("button");
     btn.type = "button";
     btn.className = "point-remove";
@@ -89,41 +140,6 @@ async function removePoint(id) {
   await deleteDoc(doc(db, "module2_points", id));
 }
 
-async function clearAllPoints() {
-  if (!db) return;
-  const qs = await getDocs(collection(db, "module2_points"));
-  await Promise.all(qs.docs.map((d) => deleteDoc(d.ref)));
-}
-
-async function onAxisChange(which) {
-  const xSel = document.getElementById("m2-axis-x");
-  const ySel = document.getElementById("m2-axis-y");
-  const newX = xSel.value;
-  const newY = ySel.value;
-  const hasPoints = points.some((p) => p.xAxis === config.xAxis && p.yAxis === config.yAxis);
-  if (hasPoints) {
-    const ok = confirm(
-      "Changer un axe réinitialise les points déjà placés sur la carte pour tout le monde. Continuer ?"
-    );
-    if (!ok) {
-      xSel.value = config.xAxis;
-      ySel.value = config.yAxis;
-      return;
-    }
-    await clearAllPoints();
-  }
-  config = { xAxis: newX, yAxis: newY };
-  if (db) {
-    await setDoc(doc(db, "module2", "config"), {
-      xAxis: newX,
-      yAxis: newY,
-      updatedAt: new Date().toISOString(),
-    });
-  }
-  renderAxisLabels();
-  renderPoints();
-}
-
 async function onMapClick(e) {
   if (e.target.closest(".map-point")) return;
   const nameInput = document.getElementById("m2-point-name");
@@ -135,36 +151,23 @@ async function onMapClick(e) {
   }
   const map = document.getElementById("m2-map");
   const rect = map.getBoundingClientRect();
-  const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
-  const y = Math.max(0, Math.min(100, 100 - ((e.clientY - rect.top) / rect.height) * 100));
+  const px = ((e.clientX - rect.left) / rect.width) * 100;
+  const py = ((e.clientY - rect.top) / rect.height) * 100;
+  const { food, design, experience } = toBarycentric(px, py);
   if (!db) {
     showToast("Base de données non configurée — voir README.md.");
     return;
   }
   await addDoc(collection(db, "module2_points"), {
     name,
-    x,
-    y,
-    xAxis: config.xAxis,
-    yAxis: config.yAxis,
+    food,
+    design,
+    experience,
     createdBy: getPrenom() || null,
     createdAt: new Date().toISOString(),
   });
   nameInput.value = "";
   nameInput.focus();
-}
-
-function subscribeConfig() {
-  if (!db) return;
-  onSnapshot(doc(db, "module2", "config"), (snap) => {
-    if (snap.exists()) {
-      const data = snap.data();
-      config = { xAxis: data.xAxis, yAxis: data.yAxis };
-      populateSelects();
-      renderAxisLabels();
-      renderPoints();
-    }
-  });
 }
 
 function subscribePoints() {
@@ -176,14 +179,9 @@ function subscribePoints() {
 }
 
 export function initModule2() {
-  populateSelects();
-  renderAxisLabels();
+  renderTriangleBackground();
   renderPoints();
-
-  document.getElementById("m2-axis-x").addEventListener("change", () => onAxisChange("x"));
-  document.getElementById("m2-axis-y").addEventListener("change", () => onAxisChange("y"));
   document.getElementById("m2-map").addEventListener("click", onMapClick);
-
-  subscribeConfig();
+  window.addEventListener("resize", renderTriangleBackground);
   subscribePoints();
 }

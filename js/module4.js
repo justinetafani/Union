@@ -44,6 +44,22 @@ function buildWheel() {
   layoutWheel();
 }
 
+function renderDefinitions() {
+  const container = document.getElementById("m4-definitions");
+  if (!container) return;
+  container.innerHTML = `<h3>Définitions</h3>`;
+  const list = document.createElement("dl");
+  ARCHETYPES.forEach((arch) => {
+    const dt = document.createElement("dt");
+    dt.textContent = arch.label;
+    const dd = document.createElement("dd");
+    dd.textContent = arch.def;
+    list.appendChild(dt);
+    list.appendChild(dd);
+  });
+  container.appendChild(list);
+}
+
 function toggleArchetype(id) {
   if (mode !== "mine") return;
   if (selected.includes(id)) {
@@ -152,6 +168,7 @@ function subscribeTeam() {
 export function initModule4() {
   buildWheel();
   renderSelection();
+  renderDefinitions();
   requestAnimationFrame(() => requestAnimationFrame(layoutWheel));
   window.addEventListener("resize", debounce(layoutWheel, 150));
   window.addEventListener("module-activated", (e) => {
